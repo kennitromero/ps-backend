@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,5 +21,21 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // La ruta se nombra de la siguiente manera: versión + módulo
 Route::get('/1.0/students',  [
-    \App\Http\Controllers\StudentController::class, 'index'
+    StudentController::class, 'index'
+]);
+
+Route::get('/1.0/students/{studentId}', [
+    StudentController::class, 'show'
+]);
+
+Route::post('/1.0/students', [
+    StudentController::class, 'create'
+]);
+
+Route::put('/1.0/students/{studentId}', [
+    StudentController::class, 'update'
+]);
+
+Route::delete('/1.0/students/{studentId}', [
+    StudentController::class, 'delete'
 ]);
