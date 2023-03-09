@@ -7,13 +7,16 @@ use Tests\TestCase;
 
 class StudentControllerTest extends TestCase
 {
-    public function testAPI10GetAllStudents(): void
+    public function testShouldAPI10GetAllStudentsResponseSuccess(): void
     {
+        // Teniendo => Un estudiante en la BD
         /** @var Student $student */
         $student = Student::factory()->create();
 
+        // Cuando => Se consuma el endpoint X
         $response = $this->get('/api/1.0/students');
 
+        // Debería tener => Aserciones que deberían darse.
         $response->assertJson([
             [
                 "id" => $student->id,
@@ -30,13 +33,16 @@ class StudentControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testAPI10GetStudent(): void
+    public function testShouldAPI10GetStudentResponseSuccess(): void
     {
+        // Teniendo => Un estudiante en la BD
         /** @var Student $student */
         $student = Student::factory()->create();
 
+        // Cuando => Se consuma el endpoint X
         $response = $this->get("/api/1.0/students/$student->id");
 
+        // Debería tener => Aserciones que deberían darse.
         $response->assertJson([
             "id" => $student->id,
             "first_name" => $student->first_name,
@@ -51,8 +57,37 @@ class StudentControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function testAPI10CreateStudent(): void
+    public function testShouldAPI10CreateStudentResponseBadRequest(): void
     {
+        $response = $this->post('/api/1.0/students', []);
+        $response->assertJson([
+            [
+                "parameter" => "first_name",
+                "message" => "El nombre es requerido."
+            ],
+            [
+                "parameter" => "last_name",
+                "message" => "El apellido es requerido."
+            ],
+            [
+                "parameter" => "email",
+                "message" => "El correo electrónico es requerido."
+            ],
+            [
+                "parameter" => "phone",
+                "message" => "El teléfono es requerido."
+            ],
+            [
+                "parameter" => "phone_code",
+                "message" => "El código de país es requerido."
+            ]
+        ]);
+        $response->assertStatus(400);
+    }
+
+    public function testShouldAPI10CreateStudentResponseSuccess(): void
+    {
+        // Teniendo
         $dataStudent = [
             "first_name" => 'Kennit',
             "last_name" => 'Ruz',
@@ -61,12 +96,26 @@ class StudentControllerTest extends TestCase
             "phone_code" => '57',
         ];
 
+        // Cuando
         $response = $this->post('/api/1.0/students', $dataStudent);
 
-        $response->assertJson($dataStudent);
+        // Debería tener => Aserciones que deberían darse.
+        $response->assertJson([
+            "first_name" => 'Kennit',
+            "last_name" => 'Ruz',
+            "email" => 'kennitromero@gmail.com',
+            "phone" => '3045652958',
+            "phone_code" => '57',
+        ]);
         $response->assertStatus(200);
 
-        $this->assertDatabaseHas(Student::class, $dataStudent);
+        $this->assertDatabaseHas(Student::class, [
+            "first_name" => 'Kennit',
+            "last_name" => 'Ruz',
+            "email" => 'kennitromero@gmail.com',
+            "phone" => '3045652958',
+            "phone_code" => '57',
+        ]);
     }
 
     public function testAPI10UpdateStudent(): void

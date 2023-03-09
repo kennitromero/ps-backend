@@ -5,9 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Student;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Psr\Log\LoggerInterface;
 
 class StudentController extends Controller
 {
+    public function __construct(private LoggerInterface $logger)
+    {
+    }
+
     /**
      * Función llamada index, no recibe parámetros,
      * retorna un objeto de tipoJsonResponse
@@ -43,6 +49,55 @@ class StudentController extends Controller
      */
     public function create(Request $request): JsonResponse
     {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|alpha|min:2|max:40',
+            'last_name' => 'required|alpha|min:2|max:40',
+            'email' => 'required|email|max:80',
+            'phone' => 'required|numeric|min_digits:10|max_digits:14',
+            'phone_code' => 'required|numeric|min_digits:1|max_digits:3',
+        ], [
+            'first_name.required' => 'El nombre es requerido.',
+            'first_name.alpha' => 'El nombre debe ser alfabético.',
+            'first_name.min' => 'El nombre debe tener mínimo 2 caracteres.',
+            'first_name.max' => 'El nombre debe tener máximo 40 caracteres.',
+
+            'last_name.required' => 'El apellido es requerido.',
+            'last_name.alpha' => 'El apellido debe ser alfabético.',
+            'last_name.min' => 'El apellido debe tener mínimo 2 caracteres.',
+            'last_name.max' => 'El apellido debe tener máximo 40 caracteres.',
+
+            'email.required' => 'El correo electrónico es requerido.',
+            'email.email' => 'El correo electrónico no es una dirección válida.',
+            'email.max' => 'El corroe electrónico debe tener máximo 80 caracteres.',
+
+            'phone.required' => 'El teléfono es requerido.',
+            'phone.numeric' => 'El teléfono debe ser numérico.',
+            'phone.min' => 'El teléfono debe tener mínimo 10 dígitos.',
+            'phone.max' => 'El teléfono debe tener máximo 14 dígitos.',
+
+            'phone_code.required' => 'El código de país es requerido.',
+            'phone_code.numeric' => 'El código de país debe ser numérico.',
+            'phone_code.min' => 'El código de país debe tener mínimo 1 digito.',
+            'phone_code.max' => 'El código de país debe tener máximo 3 dígitos.',
+        ]);
+
+        if ($validator->fails()) {
+            $badErrorResponse = [];
+
+            foreach ($validator->errors()->getMessages() as $field => $messages) {
+                foreach ($messages as $message) {
+                    $badErrorResponse[] = [
+                        'parameter' => $field,
+                        'message' => $message
+                    ];
+                }
+            }
+
+            $this->logger->warning('get.api.10.students.parameter_invalid', $request->all());
+
+            return response()->json($badErrorResponse, 400);
+        }
+
         $student = Student::create([
             'first_name' => $request->input('first_name'),
             'last_name' => $request->input('last_name'),
@@ -51,7 +106,7 @@ class StudentController extends Controller
             'phone_code' => $request->input('phone_code'),
         ]);
 
-        return response()->json($student);
+        return response()->json($student, 200);
     }
 
     /**

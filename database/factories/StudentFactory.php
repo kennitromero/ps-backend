@@ -20,8 +20,8 @@ class StudentFactory extends Factory
             'first_name' => fake()->firstName,
             'last_name' => fake()->lastName,
             'email' => fake()->email,
-            'phone' => fake()->numberBetween(300000000, 399999999),
-            'phone_code' => fake()->numberBetween(1, 999),
+            'phone' => strval(fake()->numberBetween(300000000, 399999999)),
+            'phone_code' => strval(fake()->numberBetween(1, 999)),
         ];
     }
 }
