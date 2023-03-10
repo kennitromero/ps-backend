@@ -2,6 +2,7 @@
 
 // Los "use" se utilizan para importar el namespace
 // de las clases que se necesitan en este archivo api.php
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,25 @@ Route::put('/1.0/students/{studentId}', [
 // DELETE:Ruta para eliminar un estudiante
 Route::delete('/1.0/students/{studentId}', [
     StudentController::class, 'delete'
+]);
+
+
+Route::get('/1.0/courses',  [
+    CourseController::class, 'index'
+]);
+
+Route::get('/1.0/courses/{courseId}', [
+    CourseController::class, 'show'
+]);
+
+Route::post('/1.0/courses', [
+    CourseController::class, 'create'
+]);
+
+Route::put('/1.0/courses/{courseId}', [
+    CourseController::class, 'update'
+]);
+
+Route::delete('/1.0/courses/{courseId}', [
+    CourseController::class, 'delete'
 ]);

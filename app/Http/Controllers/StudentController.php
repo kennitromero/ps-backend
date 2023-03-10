@@ -105,8 +105,7 @@ class StudentController extends Controller
             'phone' => $request->input('phone'),
             'phone_code' => $request->input('phone_code'),
         ]);
-
-        return response()->json($student, 200);
+        return response()->json($student);
     }
 
     /**
